@@ -28,11 +28,11 @@ class Calculator:
                 return self._display()
             self._left += value
         elif self._state == "op":
-            if value == "0":
-                return self._display()
             self._state = "right"
             self._right = value
         else:
+            if self._right == "0" and value == "0":
+                return self._display()
             self._right += value
         return self._display()
 

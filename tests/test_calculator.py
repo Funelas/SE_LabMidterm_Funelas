@@ -55,14 +55,14 @@ class TestCalculator(unittest.TestCase):
     # --- Edge Cases ---
 
     def test_evaluate_with_no_input(self):
-        """Edge case: pressing = with nothing entered should return empty string"""
+        """Edge case: pressing = with nothing entered should return 0"""
         result = self.calc.evaluate()
-        self.assertEqual(result, "")
+        self.assertEqual(result, "0")
 
     def test_operator_without_left_number(self):
         """Edge case: pressing operator before any number should do nothing"""
         result = self.calc.press_operator("+")
-        self.assertEqual(result, "")
+        self.assertEqual(result, "0")
 
     def test_replacing_operator(self):
         """Edge case: pressing multiple operators in a row should only keep the last one"""
@@ -75,13 +75,75 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(result, "4")
 
     def test_clear_resets_state(self):
-        """Edge case: clear mid-expression should fully reset"""
+        """Edge case: clear mid-expression should fully reset to 0"""
         self.calc.press_number("9")
         self.calc.press_operator("+")
         self.calc.press_number("1")
         self.calc.clear()
         result = self.calc.evaluate()
-        self.assertEqual(result, "")
+        self.assertEqual(result, "0")
+
+    # --- Decimal Cases ---
+
+    def test_decimal_addition(self):
+        """Positive: 1.5 + 2.5 = 4"""
+        self.calc.press_number("1")
+        self.calc.press_decimal()
+        self.calc.press_number("5")
+        self.calc.press_operator("+")
+        self.calc.press_number("2")
+        self.calc.press_decimal()
+        self.calc.press_number("5")
+        result = self.calc.evaluate()
+        self.assertEqual(result, "4")
+
+    def test_decimal_less_than_one(self):
+        """Positive: pressing . first gives 0. prefix, so .5 + .3 = 0.8"""
+        self.calc.press_decimal()
+        self.calc.press_number("5")
+        self.calc.press_operator("+")
+        self.calc.press_decimal()
+        self.calc.press_number("3")
+        result = self.calc.evaluate()
+        self.assertEqual(result, "0.8")
+
+    def test_duplicate_decimal_ignored(self):
+        """Edge case: pressing . twice on the same number should be ignored"""
+        self.calc.press_number("1")
+        self.calc.press_decimal()
+        self.calc.press_decimal()
+        self.calc.press_number("5")
+        result = self.calc.press_number("0")
+        self.assertEqual(result, "1.50")
+
+    def test_decimal_after_operator(self):
+        """Edge case: pressing . right after an operator starts right operand as 0."""
+        self.calc.press_number("2")
+        self.calc.press_operator("*")
+        self.calc.press_decimal()
+        self.calc.press_number("4")
+        result = self.calc.evaluate()
+        self.assertEqual(result, "0.8")
+
+    def test_clear_after_error_resets_to_zero(self):
+        """Positive: after error, clear should reset display to 0"""
+        self.calc.press_number("1")
+        self.calc.press_operator("/")
+        self.calc.press_number("0")
+        self.calc.evaluate()
+        result = self.calc.clear()
+        self.assertEqual(result, "0")
+        self.assertFalse(self.calc.is_error())
+
+    def test_number_press_after_error_clears_and_inputs(self):
+        """Positive: after manually clearing error, pressing a number starts fresh"""
+        self.calc.press_number("5")
+        self.calc.press_operator("/")
+        self.calc.press_number("0")
+        self.calc.evaluate()
+        self.calc.clear()
+        result = self.calc.press_number("7")
+        self.assertEqual(result, "7")
 
 
 if __name__ == "__main__":
