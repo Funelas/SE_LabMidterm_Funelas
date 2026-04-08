@@ -8,7 +8,7 @@ class Calculator:
         self._state = "left"  # "left" | "op" | "right" | "error"
 
     def _display(self) -> str:
-        return self._left + self._op + self._right
+        return self._left + self._op + self._right or "0"
 
     def is_error(self) -> bool:
         return self._state == "error"
@@ -24,12 +24,30 @@ class Calculator:
         if self._state == "error":
             return "Error"
         if self._state == "left":
+            if self._left == "" and value == "0":
+                return self._display()
             self._left += value
         elif self._state == "op":
+            if value == "0":
+                return self._display()
             self._state = "right"
             self._right = value
         else:
             self._right += value
+        return self._display()
+
+    def press_decimal(self) -> str:
+        if self._state == "error":
+            return "Error"
+        if self._state == "left":
+            if "." not in self._left:
+                self._left = (self._left or "0") + "."
+        elif self._state == "op":
+            self._right = "0."
+            self._state = "right"
+        else:
+            if "." not in self._right:
+                self._right = (self._right or "0") + "."
         return self._display()
 
     def press_operator(self, op: str) -> str:

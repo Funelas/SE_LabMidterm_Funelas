@@ -12,6 +12,7 @@ class CalculatorApp(ctk.CTk):
         self._error_timer = None
         self._build_display()
         self._build_dial()
+        self._set_display("0")
 
     def _build_display(self):
         # Sunken bevel effect via a darker outer frame + inner entry
@@ -57,14 +58,23 @@ class CalculatorApp(ctk.CTk):
         AC  = {"fg": "#5C1A1A", "hover": "#8B2E2E"}
 
         def num(val):
-            return lambda: self._set_display(self._calc.press_number(val))
+            def _press():
+                if self._calc.is_error():
+                    self._calc.clear()
+                self._set_display(self._calc.press_number(val))
+            return _press
 
         def op(val):
-            return lambda: self._set_display(self._calc.press_operator(val))
+            def _press():
+                if self._calc.is_error():
+                    self._set_display(self._calc.clear())
+                    return
+                self._set_display(self._calc.press_operator(val))
+            return _press
 
         # Row 0: AC, DEL, *, /
         self._make_btn(dial, "AC",  **AC, command=lambda: self._set_display(self._calc.clear())).grid(row=0, column=0, **PAD)
-        self._make_btn(dial, "DEL", **AC, command=lambda: self._set_display(self._calc.delete())).grid(row=0, column=1, **PAD)
+        self._make_btn(dial, "DEL", **AC, command=lambda: self._set_display(self._calc.clear() if self._calc.is_error() else self._calc.delete())).grid(row=0, column=1, **PAD)
         self._make_btn(dial, "*",  **OP, command=op("*")).grid(row=0, column=2, **PAD)
         self._make_btn(dial, "/",  **OP, command=op("/")).grid(row=0, column=3, **PAD)
 
@@ -79,15 +89,16 @@ class CalculatorApp(ctk.CTk):
         self._make_btn(dial, "5", command=num("5")).grid(row=2, column=1, **PAD)
         self._make_btn(dial, "6", command=num("6")).grid(row=2, column=2, **PAD)
         self._make_btn(dial, "-", **OP, command=op("-")).grid(row=2, column=3, **PAD)
-        self._make_btn(dial, "=", height=156, **OP, command=lambda: self._set_display(self._calc.evaluate())).grid(row=3, column=3, rowspan=2, **PAD)
+        self._make_btn(dial, "=", **OP, command=lambda: self._set_display(self._calc.evaluate())).grid(row=3, column=3, **PAD)
 
         # Row 3: 1, 2, 3
         self._make_btn(dial, "1", command=num("1")).grid(row=3, column=0, **PAD)
         self._make_btn(dial, "2", command=num("2")).grid(row=3, column=1, **PAD)
         self._make_btn(dial, "3", command=num("3")).grid(row=3, column=2, **PAD)
 
-        # Row 4: 0 spanning cols 0-2
+        # Row 4: 0 spanning cols 0-2, . at col 3
         self._make_btn(dial, "0", width=240, command=num("0")).grid(row=4, column=0, columnspan=3, **PAD)
+        self._make_btn(dial, ".", **OP, command=lambda: self._set_display(self._calc.press_decimal())).grid(row=4, column=3, **PAD)
 
 
 if __name__ == "__main__":
