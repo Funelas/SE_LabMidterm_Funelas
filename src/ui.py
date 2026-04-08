@@ -9,6 +9,7 @@ class CalculatorApp(ctk.CTk):
         self.title("Calculator")
         self.resizable(False, False)
         self._calc = Calculator()
+        self._error_timer = None
         self._build_display()
         self._build_dial()
 
@@ -30,10 +31,16 @@ class CalculatorApp(ctk.CTk):
         self.display.pack(padx=DISPLAY_PADDING, pady=DISPLAY_PADDING, fill="x")
 
     def _set_display(self, value: str):
+        if self._error_timer:
+            self.after_cancel(self._error_timer)
+            self._error_timer = None
         self.display.configure(state="normal")
         self.display.delete(0, "end")
         self.display.insert(0, value)
+        self.display.xview_moveto(1)
         self.display.configure(state="readonly")
+        if value == "Error":
+            self._error_timer = self.after(2000, lambda: self._set_display(self._calc.clear()))
 
     def _make_btn(self, parent, text, command, width=72, height=72, fg="#1D263B", hover="#5C6784"):
         return ctk.CTkButton(
