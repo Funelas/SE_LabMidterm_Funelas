@@ -78,7 +78,8 @@ class CalculatorApp(ctk.CTk):
         self._make_btn(dial, "4", command=num("4")).grid(row=2, column=0, **PAD)
         self._make_btn(dial, "5", command=num("5")).grid(row=2, column=1, **PAD)
         self._make_btn(dial, "6", command=num("6")).grid(row=2, column=2, **PAD)
-        self._make_btn(dial, "=", height=156, **OP, command=lambda: self._set_display(self._calc.evaluate())).grid(row=2, column=3, rowspan=2, **PAD)
+        self._make_btn(dial, "-", **OP, command=op("-")).grid(row=2, column=3, **PAD)
+        self._make_btn(dial, "=", height=156, **OP, command=lambda: self._set_display(self._calc.evaluate())).grid(row=3, column=3, rowspan=2, **PAD)
 
         # Row 3: 1, 2, 3
         self._make_btn(dial, "1", command=num("1")).grid(row=3, column=0, **PAD)
