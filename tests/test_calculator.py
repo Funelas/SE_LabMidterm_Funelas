@@ -60,9 +60,9 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(result, "0")
 
     def test_operator_without_left_number(self):
-        """Edge case: pressing operator before any number should do nothing"""
+        """Edge case: pressing operator before any number defaults left to 0"""
         result = self.calc.press_operator("+")
-        self.assertEqual(result, "0")
+        self.assertEqual(result, "0+")
 
     def test_replacing_operator(self):
         """Edge case: pressing multiple operators in a row should only keep the last one"""

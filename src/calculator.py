@@ -51,8 +51,10 @@ class Calculator:
         return self._display()
 
     def press_operator(self, op: str) -> str:
-        if self._state == "error" or self._left == "":
+        if self._state == "error":
             return self._display()
+        if self._left == "":
+            self._left = "0"
         if self._state == "right" and self._right != "":
             result = self._evaluate()
             if result == "Error":
