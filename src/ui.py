@@ -49,30 +49,37 @@ class CalculatorApp(ctk.CTk):
         OP  = {"fg": "#3B3355", "hover": "#6C5F8A"}
         AC  = {"fg": "#5C1A1A", "hover": "#8B2E2E"}
 
-        def press(val):
-            return lambda: self._set_display(self._calc.press(val))
+        def num(val):
+            return lambda: self._set_display(self._calc.press_number(val))
 
-        # Row 0: AC, DEL, /, *, -
+        def op(val):
+            return lambda: self._set_display(self._calc.press_operator(val))
+
+        # Row 0: AC, DEL, *, /
         self._make_btn(dial, "AC",  **AC, command=lambda: self._set_display(self._calc.clear())).grid(row=0, column=0, **PAD)
         self._make_btn(dial, "DEL", **AC, command=lambda: self._set_display(self._calc.delete())).grid(row=0, column=1, **PAD)
-        self._make_btn(dial, "/",  **OP, command=press("/")).grid(row=0, column=2, **PAD)
-        self._make_btn(dial, "*",  **OP, command=press("*")).grid(row=0, column=3, **PAD)
-        self._make_btn(dial, "-",  **OP, command=press("-")).grid(row=0, column=4, **PAD)
+        self._make_btn(dial, "*",  **OP, command=op("*")).grid(row=0, column=2, **PAD)
+        self._make_btn(dial, "/",  **OP, command=op("/")).grid(row=0, column=3, **PAD)
 
-        # Rows 1-2: 7-9 and 4-6 | + spanning both rows at col 3
-        self._make_btn(dial, "7", command=press("7")).grid(row=1, column=0, **PAD)
-        self._make_btn(dial, "8", command=press("8")).grid(row=1, column=1, **PAD)
-        self._make_btn(dial, "9", command=press("9")).grid(row=1, column=2, **PAD)
-        self._make_btn(dial, "4", command=press("4")).grid(row=2, column=0, **PAD)
-        self._make_btn(dial, "5", command=press("5")).grid(row=2, column=1, **PAD)
-        self._make_btn(dial, "6", command=press("6")).grid(row=2, column=2, **PAD)
-        self._make_btn(dial, "+", width=156, height=156, **OP, command=press("+")).grid(row=1, column=3, rowspan=2, columnspan=2, **PAD)
+        # Row 1: 7, 8, 9, +
+        self._make_btn(dial, "7", command=num("7")).grid(row=1, column=0, **PAD)
+        self._make_btn(dial, "8", command=num("8")).grid(row=1, column=1, **PAD)
+        self._make_btn(dial, "9", command=num("9")).grid(row=1, column=2, **PAD)
+        self._make_btn(dial, "+", **OP, command=op("+")).grid(row=1, column=3, **PAD)
 
-        # Row 3: 1, 2, 3 | Enter spanning cols 3-4
-        self._make_btn(dial, "1", command=press("1")).grid(row=3, column=0, **PAD)
-        self._make_btn(dial, "2", command=press("2")).grid(row=3, column=1, **PAD)
-        self._make_btn(dial, "3", command=press("3")).grid(row=3, column=2, **PAD)
-        self._make_btn(dial, "Enter", width=156, **OP, command= None).grid(row=3, column=3, columnspan=2, **PAD)
+        # Row 2: 4, 5, 6 | = spanning rows 2-3
+        self._make_btn(dial, "4", command=num("4")).grid(row=2, column=0, **PAD)
+        self._make_btn(dial, "5", command=num("5")).grid(row=2, column=1, **PAD)
+        self._make_btn(dial, "6", command=num("6")).grid(row=2, column=2, **PAD)
+        self._make_btn(dial, "=", height=156, **OP, command=lambda: self._set_display(self._calc.evaluate())).grid(row=2, column=3, rowspan=2, **PAD)
+
+        # Row 3: 1, 2, 3
+        self._make_btn(dial, "1", command=num("1")).grid(row=3, column=0, **PAD)
+        self._make_btn(dial, "2", command=num("2")).grid(row=3, column=1, **PAD)
+        self._make_btn(dial, "3", command=num("3")).grid(row=3, column=2, **PAD)
+
+        # Row 4: 0 spanning cols 0-2
+        self._make_btn(dial, "0", width=240, command=num("0")).grid(row=4, column=0, columnspan=3, **PAD)
 
 
 if __name__ == "__main__":
